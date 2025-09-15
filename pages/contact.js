@@ -1,12 +1,18 @@
-import React from "react";
-import Contact from "../app/components/Contact";
-import NavBar from "../app/components/NavBar";
+import React from 'react';
+import Contact from '../app/components/Contact';
+import NavBar from '../app/components/NavBar';
+import Head from 'next/head';
 
 export default function ContactPage() {
   return (
-    <main>
-      <NavBar />
-      <Contact />
-    </main>
+    <>
+      <Head>
+        <title>Contact | The Little Yorkshire Pottery</title>
+      </Head>
+      <main>
+        <NavBar />
+        <Contact />
+      </main>
+    </>
   );
 }
