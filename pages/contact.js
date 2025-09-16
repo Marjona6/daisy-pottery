@@ -2,6 +2,7 @@ import React from 'react';
 import Contact from '../app/components/Contact';
 import NavBar from '../app/components/NavBar';
 import Head from 'next/head';
+import PageBody from '../app/components/atoms/PageBody';
 
 export default function ContactPage() {
   return (
@@ -11,7 +12,9 @@ export default function ContactPage() {
       </Head>
       <main>
         <NavBar />
-        <Contact />
+        <PageBody>
+          <Contact />
+        </PageBody>
       </main>
     </>
   );

@@ -11,73 +11,63 @@ export default function Contact() {
     info: { error: false, msg: null },
   });
 
+  // URL-encode form data for x-www-form-urlencoded submission
+  const encode = (data) =>
+    Object.keys(data)
+      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+      .join('&');
+
   const handleServerResponse = (ok, msg) => {
     if (ok) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
-      setInputs({
-        email: '',
-        message: '',
-      });
+      // Reset inputs
+      setName('');
+      setEmail('');
+      setMessage('');
     } else {
-      setStatus({
-        info: { error: true, msg: msg },
-      });
+      setStatus((prev) => ({
+        ...prev,
+        submitting: false,
+        info: { error: true, msg },
+      }));
     }
   };
 
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async (e) => {
     e.preventDefault();
-    setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
-    fetch(CONTACT_FORM_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode({
-        'form-name': 'contact',
-        name,
-        email,
-        message,
-        subject: 'New Lead on The Little Yorkshire Pottery',
-      }),
-    })
-      .then((response) => {
-        handleServerResponse(true, 'Thank you, your message has been submitted.');
-      })
-      .catch((error) => {
-        console.log({ error });
-        handleServerResponse(false, error);
+    setStatus((prev) => ({ ...prev, submitting: true, info: { error: false, msg: null } }));
+
+    try {
+      const res = await fetch(CONTACT_FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encode({
+          // Not strictly required by Formspree, but harmless to include
+          'form-name': 'contact',
+          name,
+          email, // Formspree captures this as the reply-to
+          message,
+          subject: 'New Lead on The Little Yorkshire Pottery',
+        }),
       });
-  };
 
-  const encode = (data) => {
-    return Object.keys(data)
-      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-      .join('&');
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch(CONTACT_FORM_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode({
-        'form-name': 'contact',
-        name,
-        email,
-        message,
-        subject: 'New Lead on The Little Yorkshire Pottery',
-      }),
-    })
-      .then(() => alert('Message sent!'))
-      .catch((error) => alert(error));
+      if (!res.ok) throw new Error('Submission failed');
+      handleServerResponse(true, 'Thank you, your message has been submitted.');
+    } catch (error) {
+      handleServerResponse(false, error.message || 'Something went wrong. Please try again.');
+    }
   };
 
   return (
     <section id="contact" className="relative">
-      <div className="container px-5 py-10 mx-auto flex sm:flex-nowrap flex-wrap">
+      <div className="container mx-auto flex flex-col px-10 py-20 items-center">
+        <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-prussian-blue">
+          Send me a message
+        </h1>
         <form
           name="contact"
           onSubmit={handleOnSubmit}
@@ -91,7 +81,9 @@ export default function Contact() {
               type="text"
               id="name"
               name="name"
+              value={name}
               onChange={(e) => setName(e.target.value)}
+              required
               className="w-full rounded border border-gray-700 focus:border-verdigris focus:ring-2 focus:ring-verdigris text-base outline-none text-oxford-blue py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -102,8 +94,10 @@ export default function Contact() {
             <input
               type="email"
               id="email"
-              name="_replyto"
+              name="email"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               className="w-full rounded border border-gray-700 focus:border-verdigris focus:ring-2 focus:ring-verdigris text-base outline-none text-oxford-blue py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -114,16 +108,26 @@ export default function Contact() {
             <textarea
               id="message"
               name="message"
+              value={message}
               onChange={(e) => setMessage(e.target.value)}
+              required
               className="w-full rounded border border-gray-700 focus:border-verdigris focus:ring-2 focus:ring-verdigris h-32 text-base outline-none text-oxford-blue py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
             />
           </div>
+
+          {status.info.msg && (
+            <p className={`mb-4 text-sm ${status.info.error ? 'text-red-600' : 'text-green-600'}`}>
+              {status.info.msg}
+            </p>
+          )}
+
           <div className="w-full flex justify-center">
             <button
               type="submit"
-              className="bg-prussian-blue text-white border-0 py-2 px-6 focus:outline-none rounded text-lg w-full md:w-fit"
+              disabled={status.submitting}
+              className="bg-prussian-blue hover:bg-verdigris text-white border-0 py-2 px-6 focus:outline-none rounded text-lg w-full md:w-fit disabled:opacity-60"
             >
-              Submit
+              {status.submitting ? 'Submitting...' : status.submitted ? 'Submitted' : 'Submit'}
             </button>
           </div>
         </form>
