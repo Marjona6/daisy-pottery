@@ -44,7 +44,10 @@ export default function Contact() {
     try {
       const res = await fetch(CONTACT_FORM_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
+        },
         body: encode({
           // Not strictly required by Formspree, but harmless to include
           'form-name': 'contact',
@@ -56,7 +59,7 @@ export default function Contact() {
       });
 
       if (!res.ok) throw new Error('Submission failed');
-      handleServerResponse(true, 'Thank you, your message has been submitted.');
+      handleServerResponse(true, 'Thank you. Your message has been submitted.');
     } catch (error) {
       handleServerResponse(false, error.message || 'Something went wrong. Please try again.');
     }
