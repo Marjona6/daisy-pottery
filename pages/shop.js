@@ -9,15 +9,12 @@ export default function Shop() {
     <main>
       <NavBar />
       <PageBody>
-        Visit{' '}
-        <a
-          href={facebookUrl}
-          alt="The Little Yorkshire Pottery - Facebook"
-          className="text-verdigris"
-        >
-          The Little Yorkshire Pottery
-        </a>
-        &apos;s shop on Facebook!
+        <div className="container mx-auto flex flex-col px-10 py-20 items-center">
+          <h2 className="title-font sm:text-4xl text-3xl mb-4 text-center font-medium text-prussian-blue">
+            Shop
+          </h2>
+          <p className="mt-4 mb-4">Coming soon!</p>
+        </div>
       </PageBody>
     </main>
   );

@@ -4,6 +4,7 @@ import NavBar from '../app/components/NavBar';
 import 'tailwindcss/tailwind.css';
 import '../app/globals.css';
 import Head from 'next/head';
+import PageBody from '../app/components/atoms/PageBody';
 
 export default function AboutPage() {
   return (
@@ -14,7 +15,9 @@ export default function AboutPage() {
 
       <main>
         <NavBar />
-        <About />
+        <PageBody>
+          <About />
+        </PageBody>
       </main>
     </>
   );
